@@ -8,3 +8,4 @@ scikit-learn
 joblib
 mlxtend
 numpy
+xgboost
