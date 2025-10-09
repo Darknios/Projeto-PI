@@ -23,7 +23,7 @@ st.title("Dashboard de Crimes em Pernambuco")
 # ============================
 @st.cache_data
 def load_data():
-    df = pd.read_csv("C:/Users/Colaborador/Desktop/Projeto PI/dataset_ocorrencias_delegacia_5.csv")
+    df = pd.read_csv("dataset_ocorrencias_delegacia_5.csv")
 
     df["data_ocorrencia"] = pd.to_datetime(df["data_ocorrencia"], errors="coerce")
     df["mes"] = df["data_ocorrencia"].dt.month_name()
@@ -367,4 +367,5 @@ df_prev = pd.DataFrame(preds)
 # Mostrar tabela e gráfico
 st.dataframe(df_prev)
 st.line_chart(df_prev.set_index("Data"))
+
 # st.info("Estimativa baseada em padrões históricos e sazonais.")
