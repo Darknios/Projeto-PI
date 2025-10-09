@@ -1,9 +1,9 @@
-#Projeto-PI
-#**Storyboard – Análise Preditiva de Ocorrências Criminais**
+# Projeto-PI
+# **Storyboard – Análise Preditiva de Ocorrências Criminais**
 
-#Introdução
+# Introdução
 
-#**Problemática Proposta**
+# **Problemática Proposta**
 
 Em Pernambuco, a violência continua em patamares elevados: em 2022 foram mais de 3.400 mortes violentas intencionais (MVIs) no Estado.
 Agora Nordeste
@@ -19,7 +19,7 @@ Ainda que haja casos de sucesso — como o esclarecimento de 98% dos feminicídi
 SDS Pernambuco persistem desafios: muitos homicídios permanecem sem autoria definida, inquéritos se acumulam, e o tempo entre o cometimento do crime e sua elucidação parece ser longo ou incerto.
 
 
-#**Problemática Central:**
+# **Problemática Central:**
 
 Como Pernambuco pode reduzir de forma eficaz o tempo e aumentar a taxa de resolução (elucidação) dos crimes violentos, especialmente homicídios, diante do aumento recente de mortes violentas, do decréscimo no número de inquéritos concluídos e do elevado número de casos sem autoria definida, garantindo segurança, justiça e confiança da população na Polícia Civil?
 
