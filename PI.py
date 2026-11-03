@@ -32,6 +32,41 @@ def load_data():
 
 df = load_data()
 
+# Limite aproximado da costa do Recife, representado de sul para norte.
+_litoral_recife = (
+    (-8.15, -34.895),
+    (-8.135, -34.890),
+    (-8.12, -34.886),
+    (-8.105, -34.879),
+    (-8.09, -34.872),
+    (-8.075, -34.876),
+    (-8.05, -34.879),
+)
+
+
+def filtrar_coordenadas_em_terra(dados):
+    coordenadas = dados[["latitude", "longitude"]].apply(
+        pd.to_numeric, errors="coerce"
+    )
+    latitudes_litoral = [ponto[0] for ponto in _litoral_recife]
+    longitudes_litoral = [ponto[1] for ponto in _litoral_recife]
+    limite_litoral = np.interp(
+        coordenadas["latitude"], latitudes_litoral, longitudes_litoral
+    )
+
+    coordenadas_validas = (
+        coordenadas.notna().all(axis=1)
+        & coordenadas["latitude"].between(-8.15, -8.05)
+        & coordenadas["longitude"].between(-34.95, -34.85)
+        & (coordenadas["longitude"] <= limite_litoral)
+    )
+    dados_filtrados = dados.loc[coordenadas_validas].copy()
+    dados_filtrados[["latitude", "longitude"]] = coordenadas.loc[
+        coordenadas_validas
+    ]
+    return dados_filtrados
+
+
 # ============================
 # FILTROS
 # ============================
@@ -142,15 +177,30 @@ bairro_escolhido = st.selectbox("Selecione um bairro para visualizar no mapa", t
 df_mapa = df_filtered[df_filtered["bairro"] == bairro_escolhido]
 
 if "latitude" in df_mapa.columns and "longitude" in df_mapa.columns:
-    mapa = folium.Map(location=[df_mapa["latitude"].mean(), df_mapa["longitude"].mean()], zoom_start=13)
-
-    for _, row in df_mapa.iterrows():
-        folium.Marker(
-            [row["latitude"], row["longitude"]],
-            popup=f"{row['tipo_crime']} - {row['data_ocorrencia']}"
-        ).add_to(mapa)
-
-    st_folium(mapa, width=1000, height=500)
+    df_mapa = filtrar_coordenadas_em_terra(df_mapa)
+    if not df_mapa.empty:
+        mapa = folium.Map(tiles="OpenStreetMap")
+        for _, row in df_mapa.iterrows():
+            folium.CircleMarker(
+                location=[row["latitude"], row["longitude"]],
+                radius=4,
+                color="#d62728",
+                fill=True,
+                fill_color="#d62728",
+                fill_opacity=0.75,
+                weight=1,
+                popup=f"{row['tipo_crime']} - {row['data_ocorrencia']}",
+            ).add_to(mapa)
+        mapa.fit_bounds(
+            [
+                [df_mapa["latitude"].min(), df_mapa["longitude"].min()],
+                [df_mapa["latitude"].max(), df_mapa["longitude"].max()],
+            ],
+            padding=(20, 20),
+        )
+        st_folium(mapa, width=1000, height=500)
+    else:
+        st.warning("Não há ocorrências em terra com coordenadas válidas neste bairro.")
 else:
     st.warning("⚠️ O dataset não contém colunas de latitude/longitude para plotar no mapa.")
 
@@ -218,7 +268,9 @@ if "latitude" in df_filtered.columns and "longitude" in df_filtered.columns:
     )
 
     # Filtra apenas o bairro escolhido
-    df_cluster = df_filtered[df_filtered["bairro"] == bairro_escolhido_cluster]
+    df_cluster = filtrar_coordenadas_em_terra(
+        df_filtered[df_filtered["bairro"] == bairro_escolhido_cluster]
+    )
 
     # Seleciona coordenadas
     coords = df_cluster[["latitude", "longitude"]].dropna()
